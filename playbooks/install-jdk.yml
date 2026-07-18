@@ -4,4 +4,4 @@
   become: yes
 
   roles:
-    - java
+    - role: ../roles/java
