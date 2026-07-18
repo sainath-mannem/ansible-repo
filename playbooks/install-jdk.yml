@@ -1,0 +1,7 @@
+---
+- name: Install JDK 17
+  hosts: nodes
+  become: yes
+
+  roles:
+    - java
