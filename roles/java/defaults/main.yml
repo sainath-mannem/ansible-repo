@@ -1,1 +1,2 @@
-roles/java/tasks/main.yml
+---
+java_package: openjdk-17-jdk
