@@ -1,6 +1,6 @@
 ---
 - name: Remove Apache Tomcat
-  hosts: nodes
+  hosts: node1
   become: yes
 
   vars:
