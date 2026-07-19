@@ -1,34 +1,16 @@
 ---
 - name: Remove Apache Tomcat
-  hosts: node1
+  hosts: nodes
   become: yes
 
-  vars:
-    tomcat_user: tomcat
-    tomcat_home: /opt/tomcat
+  vars_files:
+    - vars/tomcat.yml
 
   tasks:
 
-    - name: Stop Tomcat service
-      systemd:
-        name: tomcat
-        state: stopped
+    - name: Stop Tomcat
+      shell: "{{ tomcat_home }}/bin/shutdown.sh"
       ignore_errors: yes
-
-    - name: Disable Tomcat service
-      systemd:
-        name: tomcat
-        enabled: no
-      ignore_errors: yes
-
-    - name: Remove Tomcat systemd service file
-      file:
-        path: /etc/systemd/system/tomcat.service
-        state: absent
-
-    - name: Reload systemd
-      systemd:
-        daemon_reload: yes
 
     - name: Remove Tomcat installation directory
       file:
@@ -46,3 +28,13 @@
         state: absent
         remove: yes
       ignore_errors: yes
+
+    - name: Verify Tomcat directory removed
+      stat:
+        path: "{{ tomcat_home }}"
+      register: tomcat_dir
+
+    - name: Display result
+      debug:
+        msg: "Tomcat has been removed successfully."
+      when: not tomcat_dir.stat.exists
