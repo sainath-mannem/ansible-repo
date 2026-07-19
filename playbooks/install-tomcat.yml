@@ -49,6 +49,12 @@
         recurse: yes
 
     - name: Start Tomcat
-      shell: "{{ tomcat_home }}/bin/startup.sh"
-      environment:
-        JAVA_HOME: "{{ java_home }}"
+	  shell: "{{ tomcat_home }}/bin/startup.sh"
+	  become_user: "{{ tomcat_user }}"
+	  environment:
+	    JAVA_HOME: "{{ java_home }}"
+	  register: startup_result
+
+	- name: Show startup output
+      debug:
+	    var: startup_result.stdout_lines
