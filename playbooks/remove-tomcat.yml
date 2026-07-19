@@ -1,0 +1,48 @@
+---
+- name: Remove Apache Tomcat
+  hosts: nodes
+  become: yes
+
+  vars:
+    tomcat_user: tomcat
+    tomcat_home: /opt/tomcat
+
+  tasks:
+
+    - name: Stop Tomcat service
+      systemd:
+        name: tomcat
+        state: stopped
+      ignore_errors: yes
+
+    - name: Disable Tomcat service
+      systemd:
+        name: tomcat
+        enabled: no
+      ignore_errors: yes
+
+    - name: Remove Tomcat systemd service file
+      file:
+        path: /etc/systemd/system/tomcat.service
+        state: absent
+
+    - name: Reload systemd
+      systemd:
+        daemon_reload: yes
+
+    - name: Remove Tomcat installation directory
+      file:
+        path: "{{ tomcat_home }}"
+        state: absent
+
+    - name: Remove downloaded Tomcat archive
+      file:
+        path: /tmp/apache-tomcat.tar.gz
+        state: absent
+
+    - name: Remove Tomcat user
+      user:
+        name: "{{ tomcat_user }}"
+        state: absent
+        remove: yes
+      ignore_errors: yes
