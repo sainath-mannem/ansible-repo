@@ -1,0 +1,57 @@
+---
+- name: Remove Java from servers
+  hosts: node2
+  become: yes
+
+  tasks:
+
+    - name: Check Java installation
+      command: java -version
+      register: java_check
+      failed_when: false
+      changed_when: false
+
+    - name: Display Java version
+      debug:
+        var: java_check.stderr_lines
+
+
+    - name: Remove OpenJDK packages
+      apt:
+        name:
+          - openjdk-17-jdk
+          - openjdk-17-jre
+          - openjdk-17-jre-headless
+        state: absent
+        purge: yes
+        update_cache: yes
+
+
+    - name: Remove unused dependencies
+      apt:
+        autoremove: yes
+
+
+    - name: Remove JAVA_HOME profile configuration
+      file:
+        path: /etc/profile.d/java.sh
+        state: absent
+
+
+    - name: Remove JAVA_HOME from bash profile
+      lineinfile:
+        path: /etc/environment
+        regexp: '^JAVA_HOME='
+        state: absent
+
+
+    - name: Verify Java removal
+      command: java -version
+      register: java_verify
+      failed_when: false
+      changed_when: false
+
+
+    - name: Show Java status
+      debug:
+        msg: "{{ java_verify.stderr_lines }}"
